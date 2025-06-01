@@ -1,7 +1,9 @@
 from src.database import db
 from src.const import DATABASE
+from src.error import IS_ERROR
 
 from pydantic import BaseModel
+from datetime import datetime
 
 class HiveModel(BaseModel):
     hiveId: str
@@ -26,15 +28,19 @@ class Hive:
         self.latitude = hive_model.latitude
         self.longitude = hive_model.longitude
         self.numColonies = hive_model.numColonies
+        self.timestamp = datetime.now().isoformat()
 
     def registerHive(self) -> dict:
         try:
+            if not(-90 < self.latitude <=90) or not(-180 < self.longitude <= 180):
+                raise ValueError(IS_ERROR["INVALID_LAT_LONG"]["message"])
             hive_data = {
                 "hiveId": self.hiveId,
                 "datePlaced": self.datePlaced,
                 "latitude": self.latitude,
                 "longitude": self.longitude,
-                "numColonies": self.numColonies
+                "numColonies": self.numColonies,
+                "timestamp": self.timestamp
             }
             register_id = db.register(DATABASE["HIVECOLLECTION"], hive_data)
             return register_id

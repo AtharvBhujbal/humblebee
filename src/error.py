@@ -1,6 +1,7 @@
 IS_ERROR = {
     "HIVE_REG_FAILED": {"message": "Hive registration failed"},
     "HIVE_ALREADY_EXISTS": {"message": "Hive with this ID already exists"},
+    "INVALID_LAT_LONG": {"message": "Invalid latitude or longitude values"},
 }
 
 IS_SUCCESS = {
