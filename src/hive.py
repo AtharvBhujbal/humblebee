@@ -47,3 +47,45 @@ class Hive:
         except Exception as e:
             raise e
     
+
+
+def getHives(startDate:str = None, endDate:str = None) -> list:
+    """
+    Retrieve all registered hives from the database.
+    Returns:
+        list: A list of dictionaries containing hive details.
+    """
+    try:
+        if startDate or endDate:
+            hives = db.get_all(DATABASE["HIVECOLLECTION"])
+            hives = filterHivesByDate(hives, start_date_str=startDate, end_date_str=endDate)
+        else:
+            hives = db.get_all(DATABASE["HIVECOLLECTION"])
+        return hives
+    except Exception as e:
+        raise e
+    
+def filterHivesByDate(hives: list, start_date_str: str = None, end_date_str: str = None) -> list:
+    """
+    Filter hives by date range.
+    Args:
+        hives (list): List of hive dictionaries.
+        startDate (str): Start date in 'YYYY-MM-DD' format.
+        endDate (str): End date in 'YYYY-MM-DD' format.
+    Returns:
+        list: Filtered list of hives within the specified date range.
+    """
+    start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date() if start_date_str else None
+    end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date() if end_date_str else None
+
+    result = []
+    for item in hives:
+        placed_date = datetime.strptime(item["datePlaced"], "%Y-%m-%d").date()
+
+        if start_date and placed_date < start_date:
+            continue
+        if end_date and placed_date > end_date:
+            continue
+        result.append(item)
+
+    return result

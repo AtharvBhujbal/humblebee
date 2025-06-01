@@ -15,4 +15,8 @@ class Database:
         result = collection.insert_one(data)
         return result.inserted_id
     
+    def get_all(self, collection_name: str) -> list:
+        collection = self.db[collection_name]
+        return list(collection.find({}, {"_id": 0}))
+    
 db = Database()

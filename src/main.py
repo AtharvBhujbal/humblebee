@@ -3,13 +3,13 @@ from fastapi.responses import JSONResponse
 import starlette.status as status
 
 from src.log import logger
-from src.hive import HiveModel, Hive
+from src.hive import HiveModel, Hive, getHives
 from src.error import IS_ERROR, IS_SUCCESS
 
 app = FastAPI()
 
 @app.post("/api/hives")
-async def register_hive(hive_model:HiveModel):
+def register_hive(hive_model:HiveModel):
     """
     Register a new hive with the provided details.
     """
@@ -38,3 +38,20 @@ async def register_hive(hive_model:HiveModel):
         
     return JSONResponse(status_code=status_code, content=result)
 
+@app.get("/api/hives")
+def get_hives(startDate: str = None, endDate: str = None):
+    """
+    Retrieve all registered hives, optionally filtered by startDate and endDate.
+    """
+    try:
+        hives = getHives(startDate=startDate, endDate=endDate)
+        result = IS_SUCCESS["HIVES_RETRIEVED"]
+        result["hives"] = hives
+        status_code = status.HTTP_200_OK
+
+    except Exception as e:
+        logger.exception(f"Failed to retrieve hives: {str(e)}")
+        result = IS_ERROR["HIVE_REG_FAILED"]
+        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        
+    return JSONResponse(status_code=status_code, content=result)
