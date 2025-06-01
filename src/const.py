@@ -1,0 +1,3 @@
+DATABASE = {
+    "HIVECOLLECTION": "hive",
+}
