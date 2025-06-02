@@ -21,7 +21,7 @@ class Crop:
         self.longitude = crop_model.longitude
         self.recommendedHiveDensity = crop_model.recommendedHiveDensity
 
-    def registerCrop(self) -> str:
+    def register_crop(self) -> str:
         try:
             if utils.is_valid_lat_long(self.latitude, self.longitude) is False:
                 raise ValueError(IS_ERROR["INVALID_LAT_LONG"]["message"])

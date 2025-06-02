@@ -4,7 +4,7 @@ import starlette.status as status
 from datetime import datetime
 
 from src.log import logger
-from src.hive import HiveModel, Hive, getHives
+from src.hive import HiveModel, Hive, get_filtered_hives
 from src.error import IS_ERROR, IS_SUCCESS
 from src.crop import CropModel, Crop, get_nearby_crop
 
@@ -46,7 +46,7 @@ def get_hives(startDate: str = None, endDate: str = None):
     Retrieve all registered hives, optionally filtered by startDate and endDate.
     """
     try:
-        hives = getHives(startDate=startDate, endDate=endDate)
+        hives = get_filtered_hives(startDate=startDate, endDate=endDate)
         result = IS_SUCCESS["HIVES_RETRIEVED"]
         result["hives"] = hives
         status_code = status.HTTP_200_OK
@@ -65,7 +65,7 @@ def register_crop(crop_model: CropModel):
     """
     try:
         crop = Crop(crop_model=crop_model)
-        register_id = crop.registerCrop()
+        register_id = crop.register_crop()
         result = IS_SUCCESS["CROP_REG_SUCCESS"]
         result["cropId"] = register_id
         status_code = status.HTTP_200_OK

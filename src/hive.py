@@ -50,7 +50,7 @@ class Hive:
     
 
 
-def getHives(startDate:str = None, endDate:str = None) -> list:
+def get_filtered_hives(startDate:str = None, endDate:str = None) -> list:
     """
     Retrieve all registered hives from the database.
     Returns:
