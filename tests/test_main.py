@@ -3,7 +3,7 @@ from unittest.mock import patch
 from datetime import datetime
 
 from src.error import IS_ERROR, IS_SUCCESS
-from src.hive import convert_to_date_time
+import src.utils as utils
 from src.main import app
 client = TestClient(app)
 
@@ -102,7 +102,7 @@ def test_get_nearby_crop(mock_register):
         "latitude": 26.9124,
         "longitude": 75.7873,
         "radius": 1000,
-        "date": convert_to_date_time("2025-04-15")
+        "date": utils.convert_to_date_time("2025-04-15")
     })
     mock_register.assert_called_once()
     assert response.status_code == 200

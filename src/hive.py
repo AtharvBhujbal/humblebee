@@ -1,6 +1,7 @@
 from src.database import db
 from src.const import DATABASE
 from src.error import IS_ERROR
+import src.utils as utils
 
 from pydantic import BaseModel
 from datetime import datetime
@@ -32,7 +33,7 @@ class Hive:
 
     def registerHive(self) -> str:
         try:
-            if not(-90 < self.latitude <=90) or not(-180 < self.longitude <= 180):
+            if utils.is_valid_lat_long(self.latitude, self.longitude) is False:
                 raise ValueError(IS_ERROR["INVALID_LAT_LONG"]["message"])
             hive_data = {
                 "hiveId": self.hiveId,
@@ -58,34 +59,9 @@ def getHives(startDate:str = None, endDate:str = None) -> list:
     try:
         if startDate or endDate:
             hives = db.get_all(DATABASE["HIVECOLLECTION"])
-            hives = filterHivesByDate(hives, start_date_str=startDate, end_date_str=endDate)
+            hives = utils.filter_hives_by_date_range(hives, start_date_str=startDate, end_date_str=endDate)
         else:
             hives = db.get_all(DATABASE["HIVECOLLECTION"])
         return hives
     except Exception as e:
         raise e
-    
-def filterHivesByDate(hives: list, start_date_str: str = None, end_date_str: str = None) -> list:
-    """
-    Filter hives by date range.
-    Args:
-        hives (list): List of hive dictionaries.
-        startDate (str): Start date in 'YYYY-MM-DD' format.
-        endDate (str): End date in 'YYYY-MM-DD' format.
-    Returns:
-        list: Filtered list of hives within the specified date range.
-    """
-    start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date() if start_date_str else None
-    end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date() if end_date_str else None
-
-    result = []
-    for item in hives:
-        placed_date = datetime.strptime(item["datePlaced"], "%Y-%m-%d").date()
-
-        if start_date and placed_date < start_date:
-            continue
-        if end_date and placed_date > end_date:
-            continue
-        result.append(item)
-
-    return result
