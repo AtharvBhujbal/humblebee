@@ -2,6 +2,7 @@ from src.database import db
 from src.error import IS_ERROR, IS_SUCCESS
 from src.const import DATABASE
 from pydantic import BaseModel
+from src.utils import calculate_distance, is_valid_lat_long, filter_crops_by_date_range
 
 class CropModel(BaseModel):
     name: str
@@ -22,7 +23,7 @@ class Crop:
 
     def registerCrop(self) -> str:
         try:
-            if not(-90 < self.latitude <=90) or not(-180 < self.longitude <= 180):
+            if is_valid_lat_long(self.latitude, self.longitude) is False:
                 raise ValueError(IS_ERROR["INVALID_LAT_LONG"]["message"])
             crop_data = {
                 "name": self.name,
@@ -36,3 +37,22 @@ class Crop:
             return str(register_id)
         except Exception as e:
             raise e
+        
+def get_nearby_crop(latitude: float, longitude: float, radius: int, date: str) -> list:
+    try:
+        if is_valid_lat_long(latitude, longitude) is False:
+            raise ValueError(IS_ERROR["INVALID_LAT_LONG"]["message"])
+        
+        crops = db.get_all(DATABASE["CROPCOLLECTION"])
+        crops = filter_crops_by_date_range(crops, date)
+        nearby_crops = []
+        
+        for crop in crops:
+            crop_coords = (crop["latitude"], crop["longitude"])
+            distance_to_crop = calculate_distance((latitude, longitude), crop_coords)
+            if distance_to_crop <= radius:
+                nearby_crops.append(crop)
+        
+        return nearby_crops
+    except Exception as e:
+        raise e

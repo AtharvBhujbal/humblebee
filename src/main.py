@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 import starlette.status as status
+from datetime import datetime
 
 from src.log import logger
 from src.hive import HiveModel, Hive, getHives
 from src.error import IS_ERROR, IS_SUCCESS
-from src.crop import CropModel, Crop
+from src.crop import CropModel, Crop, get_nearby_crop
 
 app = FastAPI()
 
@@ -72,4 +73,21 @@ def register_crop(crop_model: CropModel):
         logger.error(f"Invalid latitude or longitude for crop {crop_model.name}: {str(ve)}")
         result = IS_ERROR["INVALID_LAT_LONG"]
         status_code = status.HTTP_400_BAD_REQUEST
+    return JSONResponse(status_code=status_code, content=result)
+
+@app.get("/api/crops/nearby")
+def get_crops(latitude: float, longitude: float, radius: float = 100, date: str = datetime.now().date().isoformat()):
+    """
+    Retrieve crops within a specified radius from the given latitude and longitude.
+    """
+    try:
+        crops = get_nearby_crop(latitude=latitude, longitude=longitude, radius=radius, date=date)
+        result = IS_SUCCESS["CROPS_RETRIEVED"]
+        result["crops"] = crops
+        status_code = status.HTTP_200_OK
+    except Exception as e:
+        logger.exception(f"Failed to retrieve nearby crops: {str(e)}")
+        result = IS_ERROR["CROP_RETRIEVE_FAILED"]
+        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        
     return JSONResponse(status_code=status_code, content=result)

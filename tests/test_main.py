@@ -3,6 +3,7 @@ from unittest.mock import patch
 from datetime import datetime
 
 from src.error import IS_ERROR, IS_SUCCESS
+from src.hive import convert_to_date_time
 from src.main import app
 client = TestClient(app)
 
@@ -82,4 +83,28 @@ def test_register_crop(mock_register):
     })
     assert response.status_code == 200
     assert response.json() == IS_SUCCESS["CROP_REG_SUCCESS"]
+    mock_register.assert_called_once()
+
+@patch("src.database.db.register")
+def test_get_nearby_crop(mock_register):
+    mock_register.return_value = "crop123"
+    response = client.post("/api/crops", json={
+        "name": "Sunflower",
+        "floweringStart": "2025-04-10",
+        "floweringEnd": "2025-04-25",
+        "latitude": 26.9124,
+        "longitude": 75.7873,
+        "recommendedHiveDensity": 5
+    })
+    assert response.status_code == 200
+    assert response.json() == IS_SUCCESS["CROP_REG_SUCCESS"]
+    response = client.get("/api/crops/nearby", params={
+        "latitude": 26.9124,
+        "longitude": 75.7873,
+        "radius": 1000,
+        "date": convert_to_date_time("2025-04-15")
+    })
+    mock_register.assert_called_once()
+    assert response.status_code == 200
+    assert response.json() == IS_SUCCESS["CROPS_RETRIEVED"]
     mock_register.assert_called_once()
