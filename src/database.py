@@ -8,9 +8,9 @@ class Database:
         self.db = self.client["humblebee"]
 
 
-    def register(self, collection_name: str, data: dict) -> str:
+    def register(self, collection_name: str, data: dict, is_hive: bool = False) -> str:
         collection = self.db[collection_name]
-        if collection.find_one({"hiveId": data["hiveId"]}):
+        if is_hive and collection.find_one({"hiveId": data["hiveId"]}):
             raise ValueError(IS_ERROR["HIVE_ALREADY_EXISTS"]["message"])
         result = collection.insert_one(data)
         return result.inserted_id

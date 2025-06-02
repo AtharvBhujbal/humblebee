@@ -30,7 +30,7 @@ class Hive:
         self.numColonies = hive_model.numColonies
         self.timestamp = datetime.now().isoformat()
 
-    def registerHive(self) -> dict:
+    def registerHive(self) -> str:
         try:
             if not(-90 < self.latitude <=90) or not(-180 < self.longitude <= 180):
                 raise ValueError(IS_ERROR["INVALID_LAT_LONG"]["message"])
@@ -42,8 +42,8 @@ class Hive:
                 "numColonies": self.numColonies,
                 "timestamp": self.timestamp
             }
-            register_id = db.register(DATABASE["HIVECOLLECTION"], hive_data)
-            return register_id
+            register_id = db.register(DATABASE["HIVECOLLECTION"], hive_data, is_hive=True)
+            return str(register_id)
         except Exception as e:
             raise e
     

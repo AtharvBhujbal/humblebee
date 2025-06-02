@@ -69,3 +69,17 @@ def test_get_hives(mock_get_hives):
         "hives": mock_get_hives.return_value
     }
     mock_get_hives.assert_called_once()
+
+@patch("src.database.db.register")
+def test_register_crop(mock_register):
+    response = client.post("/api/crops", json={
+        "name": "Sunflower",
+        "floweringStart": "2025-04-10",
+        "floweringEnd": "2025-04-25",
+        "latitude": 26.9124,
+        "longitude": 75.7873,
+        "recommendedHiveDensity": 5
+    })
+    assert response.status_code == 200
+    assert response.json() == IS_SUCCESS["CROP_REG_SUCCESS"]
+    mock_register.assert_called_once()

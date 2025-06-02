@@ -8,4 +8,5 @@ IS_ERROR = {
 IS_SUCCESS = {
     "HIVE_REG_SUCCESS": {"message": "Hive registered successfully"},
     "HIVES_RETRIEVED": {"message": "Hives retrieved successfully"},
+    "CROP_REG_SUCCESS": {"message": "Crop registered successfully"}
 }
