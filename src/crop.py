@@ -58,3 +58,15 @@ def get_nearby_crop(latitude: float, longitude: float, radius: int, date: str) -
         return nearby_crops
     except Exception as e:
         raise e
+    
+def get_all_crops() -> list:
+    """
+    Retrieve all registered crops from the database.
+    Returns:
+        list: A list of dictionaries containing crop details.
+    """
+    try:
+        crops = db.get_all(DATABASE["CROPCOLLECTION"])
+        return crops
+    except Exception as e:
+        raise e

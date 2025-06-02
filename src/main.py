@@ -6,7 +6,8 @@ from datetime import datetime
 from src.log import logger
 from src.hive import HiveModel, Hive, get_filtered_hives
 from src.error import IS_ERROR, IS_SUCCESS
-from src.crop import CropModel, Crop, get_nearby_crop
+from src.crop import CropModel, Crop, get_nearby_crop, get_all_crops
+import src.utils as utils
 
 app = FastAPI()
 
@@ -71,7 +72,7 @@ def register_crop(crop_model: CropModel):
         status_code = status.HTTP_200_OK
     except ValueError as ve:
         logger.error(f"Invalid latitude or longitude for crop {crop_model.name}: {str(ve)}")
-        result = IS_ERROR["INVALID_LAT_LONG"]
+        result = IS_ERROR["CROP_REG_FAILED"]
         status_code = status.HTTP_400_BAD_REQUEST
     return JSONResponse(status_code=status_code, content=result)
 
@@ -90,4 +91,20 @@ def get_crops(latitude: float, longitude: float, radius: float = 100, date: str 
         result = IS_ERROR["CROP_RETRIEVE_FAILED"]
         status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         
+    return JSONResponse(status_code=status_code, content=result)
+
+@app.get("/api/crops/export")
+def export_crops():
+    """
+    Export all crops in a CSV format.
+    """
+    try:
+        crops = get_all_crops()
+        utils.export_crops_to_csv(crops)
+        result = IS_SUCCESS["CROPS_EXPORTED"]
+        status_code = status.HTTP_200_OK
+    except Exception as e:
+        logger.exception(f"Failed to export crops: {str(e)}")
+        result = IS_ERROR["CROP_EXPORT_FAILED"]
+        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     return JSONResponse(status_code=status_code, content=result)

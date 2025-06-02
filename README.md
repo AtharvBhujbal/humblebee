@@ -8,6 +8,7 @@
 | `api/hives/`      | **Get Hive**       | `GET`            | Allows users to retrieves all hive or filter by dates. |
 | `api/crops`           | **Register Crop**  | `POST`           | Allow users to register a new crop with its details. |
 | `api/crops/nearby`    | **Get Crop**       | `GET`            | Allow users to retrieves all crops or filters them by start and end date. |
+| `api/crops/export` | **Export Crops**   | `GET`            | Allows users to export all crops in CSV format. |
 
 ## Installation
 

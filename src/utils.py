@@ -1,5 +1,6 @@
 from datetime import datetime
 from geopy.distance import distance
+import pandas as pd
 
 def convert_to_date_time(date_str: str) -> datetime:
     """
@@ -86,3 +87,14 @@ def is_crop_period_invalid(flowering_start: str, flowering_end: str) -> bool:
     start_date = convert_to_date_time(flowering_start)
     end_date = convert_to_date_time(flowering_end)
     return start_date >= end_date
+
+def export_crops_to_csv(crops: list) -> None:
+    """
+    Export crops to a CSV file.
+    Args:
+        crops (list): List of crops to export.
+        filename (str): Name of the output CSV file.
+    """
+    df = pd.DataFrame(crops)
+    df.drop(columns=["_id"], inplace=True, errors='ignore')
+    df.to_csv("crops.csv", index=False)
